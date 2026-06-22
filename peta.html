@@ -3,7 +3,7 @@
     <head>
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <meta name="viewport" content="initial-scale=1,user-scalable=no,maximum-scale=1,width=device-width">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
         <meta name="mobile-web-app-capable" content="yes">
         <meta name="apple-mobile-web-app-capable" content="yes">
         
@@ -31,7 +31,7 @@
         .ui-floating {
             position: absolute;
             top: 20px;
-            left: 60px;
+            left: 60px; /* Jarak aman dari tombol zoom Leaflet */
             z-index: 1000;
             display: flex;
             align-items: center;
@@ -39,7 +39,7 @@
         }
 
         .btn-back {
-            background: rgba(255, 255, 255, 0.9);
+            background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(8px);
             color: #2c3e50;
             padding: 10px 20px;
@@ -55,15 +55,15 @@
             border: 1px solid rgba(255,255,255,0.5);
         }
 
-        .btn-back:hover {
+        .btn-back:hover, .btn-back:active {
             background: #3498db;
             color: white;
-            transform: translateY(-3px);
+            transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4);
         }
 
         .map-title {
-            background: rgba(255, 255, 255, 0.9);
+            background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(8px);
             color: #2c3e50;
             padding: 10px 25px;
@@ -75,27 +75,27 @@
             letter-spacing: 0.5px;
         }
 
-        @media (max-width: 600px) {
-            .ui-floating { top: 15px; left: 55px; flex-direction: column; align-items: flex-start; gap: 10px; }
-            .map-title { font-size: 13px; padding: 8px 15px; display: none; }
-        }
-
         /* CUSTOM UI: Pop-up & Legenda */
         .leaflet-popup-content-wrapper {
             border-radius: 12px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.25);
             font-family: 'Poppins', sans-serif;
         }
-        .leaflet-popup-content { margin: 15px; line-height: 1.6; }
+        
+        .leaflet-popup-content { 
+            margin: 15px; 
+            line-height: 1.6; 
+            max-width: 280px; /* Mencegah popup terlalu lebar */
+        }
         
         .btn-gmaps {
             background: #3498db;
             color: white !important;
-            padding: 8px 12px;
-            border-radius: 6px;
+            padding: 10px 12px; /* Area sentuh diperbesar agar mudah diklik jempol */
+            border-radius: 8px;
             text-decoration: none;
             font-weight: 600;
-            font-size: 12px;
+            font-size: 13px;
             display: inline-flex;
             align-items: center;
             gap: 6px;
@@ -103,16 +103,52 @@
             transition: background 0.3s;
             width: 100%;
             justify-content: center;
+            box-shadow: 0 4px 10px rgba(52, 152, 219, 0.3);
         }
-        .btn-gmaps:hover { background: #2980b9; }
+        .btn-gmaps:hover, .btn-gmaps:active { 
+            background: #2980b9; 
+        }
 
         .leaflet-control-layers {
             border: none !important;
             border-radius: 12px !important;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.15) !important;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2) !important;
             background: rgba(255, 255, 255, 0.95) !important;
             backdrop-filter: blur(5px);
             padding: 5px;
+        }
+
+        /* ====================================================
+           MEDIA QUERIES (Mobile Responsive)
+           ==================================================== */
+        @media (max-width: 600px) {
+            .ui-floating { 
+                top: 12px; 
+                left: 50px; /* Menyesuaikan dengan tombol zoom di kiri */
+                gap: 10px; 
+            }
+            .btn-back {
+                padding: 8px 15px;
+                font-size: 13px;
+            }
+            .map-title { 
+                display: none; /* Sembunyikan judul di layar kecil agar tidak sesak */
+            }
+            .leaflet-popup-content { 
+                max-width: 220px; /* Popup lebih ramping di HP */
+            }
+            .leaflet-control-attribution {
+                font-size: 9px !important; /* Mengecilkan teks copyright di kanan bawah */
+                max-width: 200px;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+            /* Memperbesar area sentuh ikon layer/legenda di HP */
+            .leaflet-control-layers-toggle {
+                width: 44px;
+                height: 44px;
+            }
         }
         </style>
         <title>WebGIS Desa Penyandingan</title>
@@ -145,7 +181,6 @@
         <script src="data/JalanSekitarDesaPenyandingan_5.js"></script>
         
         <script>
-        // Inisialisasi Peta
         var map = L.map('map', {
             zoomControl:false, maxZoom:28, minZoom:1
         }).fitBounds([[-4.7182583922343735,103.28391944295674],[-4.707403064048001,103.30059281782914]]);
@@ -169,36 +204,30 @@
          return tempDiv.innerHTML;
         }
 
-        // Posisi Zoom Control
         var zoomControl = L.control.zoom({ position: 'topleft' }).addTo(map);
         var bounds_group = new L.featureGroup([]);
         function setBounds() {}
 
-        // Basemaps
         map.createPane('pane_OSMStandard_0');
         map.getPane('pane_OSMStandard_0').style.zIndex = 400;
-        var layer_OSMStandard_0 = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { pane: 'pane_OSMStandard_0', opacity: 1.0, attribution: '© OpenStreetMap contributors', minZoom: 1, maxZoom: 28, minNativeZoom: 0, maxNativeZoom: 19 });
+        var layer_OSMStandard_0 = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { pane: 'pane_OSMStandard_0', opacity: 1.0, attribution: '© OpenStreetMap', minZoom: 1, maxZoom: 28, minNativeZoom: 0, maxNativeZoom: 19 });
         map.addLayer(layer_OSMStandard_0);
 
         map.createPane('pane_GoogleHybrid_1');
         map.getPane('pane_GoogleHybrid_1').style.zIndex = 401;
-        var layer_GoogleHybrid_1 = L.tileLayer('https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', { pane: 'pane_GoogleHybrid_1', opacity: 1.0, attribution: 'Map data © Google', minZoom: 1, maxZoom: 28, minNativeZoom: 0, maxNativeZoom: 20 });
+        var layer_GoogleHybrid_1 = L.tileLayer('https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', { pane: 'pane_GoogleHybrid_1', opacity: 1.0, attribution: '© Google', minZoom: 1, maxZoom: 28, minNativeZoom: 0, maxNativeZoom: 20 });
         map.addLayer(layer_GoogleHybrid_1);
 
         map.createPane('pane_GoogleSatellite_2');
         map.getPane('pane_GoogleSatellite_2').style.zIndex = 402;
-        var layer_GoogleSatellite_2 = L.tileLayer('https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', { pane: 'pane_GoogleSatellite_2', opacity: 1.0, attribution: 'Map data © Google', minZoom: 1, maxZoom: 28, minNativeZoom: 0, maxNativeZoom: 20 });
+        var layer_GoogleSatellite_2 = L.tileLayer('https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', { pane: 'pane_GoogleSatellite_2', opacity: 1.0, attribution: '© Google', minZoom: 1, maxZoom: 28, minNativeZoom: 0, maxNativeZoom: 20 });
         map.addLayer(layer_GoogleSatellite_2);
 
-        // ---------------------------------------------------------
-        // LAYER EFEK GELAP LUAR DESA (INVERTED POLYGON / MASK)
-        // ---------------------------------------------------------
         var maskHoles = [];
-        // Mengambil koordinat batas desa untuk dijadikan lubang
         json_garis_desa_3.features.forEach(function(feat) {
             var coords = feat.geometry.coordinates;
             if (feat.geometry.type === 'Polygon') {
-                var hole = coords[0].map(function(c) { return [c[1], c[0]]; }); // ubah [lng, lat] ke [lat, lng]
+                var hole = coords[0].map(function(c) { return [c[1], c[0]]; }); 
                 maskHoles.push(hole);
             } else if (feat.geometry.type === 'MultiPolygon') {
                 coords.forEach(function(polygon) {
@@ -208,23 +237,21 @@
             }
         });
 
-        // Koordinat batas seluruh dunia (kotak raksasa)
         var worldBounds = [ [-90, -180], [90, -180], [90, 180], [-90, 180], [-90, -180] ];
         var maskCoordinates = [worldBounds];
         maskHoles.forEach(function(hole) { maskCoordinates.push(hole); });
 
         map.createPane('pane_EfekGelap');
-        map.getPane('pane_EfekGelap').style.zIndex = 402; // Letakkan pas di atas satelit
+        map.getPane('pane_EfekGelap').style.zIndex = 402; 
         var layer_EfekGelap = L.polygon(maskCoordinates, {
             pane: 'pane_EfekGelap',
             color: 'transparent',
             fillColor: '#000000',
-            fillOpacity: 0.6, // Ganti angka ini (0.1 - 0.9) untuk mengatur tingkat kegelapan
-            interactive: false // Agar tetap bisa di-klik jalan dan posko di bawahnya
+            fillOpacity: 0.6, 
+            interactive: false 
         });
-        map.addLayer(layer_EfekGelap); // Tampilkan secara default
+        map.addLayer(layer_EfekGelap); 
 
-        // Layer Garis Desa
         function pop_garis_desa_3(feature, layer) {
             var popupContent = '<table><tr><td colspan="2" style="font-size:13px;"><strong>Batas Desa Penyandingan</strong></td></tr></table>';
             var content = removeEmptyRowsFromPopupContent(popupContent, feature);
@@ -239,7 +266,6 @@
         bounds_group.addLayer(layer_garis_desa_3);
         map.addLayer(layer_garis_desa_3);
 
-        // Layer POI
         function pop_POIPointofInterest_4(feature, layer) {
             var lat = feature.geometry.coordinates[1];
             var lng = feature.geometry.coordinates[0];
@@ -247,7 +273,7 @@
             var namaLokasi = feature.properties['Nama'] !== null ? String(feature.properties['Nama']) : 'Fasilitas Desa';
             var popupContent = '<div style="text-align:center;">' +
                                '<h4 style="margin:0 0 5px 0; color:#2c3e50; font-size:15px;">' + namaLokasi + '</h4>' +
-                               '<p style="margin:0 0 5px 0; font-size:11px; color:#7f8c8d;">Lokasi Penting / Fasilitas Umum</p>' +
+                               '<p style="margin:0 0 10px 0; font-size:11px; color:#7f8c8d;">Lokasi Penting / Fasilitas Umum</p>' +
                                '<a href="' + gmapsLink + '" target="_blank" class="btn-gmaps">' +
                                '<i class="fa-solid fa-location-arrow"></i> Buka Rute di Gmaps</a></div>';
             var content = removeEmptyRowsFromPopupContent(popupContent, feature);
@@ -262,7 +288,6 @@
         bounds_group.addLayer(layer_POIPointofInterest_4);
         map.addLayer(layer_POIPointofInterest_4);
 
-        // Layer Jalan
         function pop_JalanSekitarDesaPenyandingan_5(feature, layer) {
             var popupContent = '<table><tr><td colspan="2" style="font-size:13px;"><strong>Akses Jalan Lingkungan</strong></td></tr></table>';
             var content = removeEmptyRowsFromPopupContent(popupContent, feature);
@@ -277,7 +302,6 @@
         bounds_group.addLayer(layer_JalanSekitarDesaPenyandingan_5);
         map.addLayer(layer_JalanSekitarDesaPenyandingan_5);
 
-        // Pengaturan Legenda (Layer Control)
         var overlaysTree = [
             {label: '<b>Tampilan Visual</b>', selectAllCheckbox: true, children: [
                 {label: 'Efek Fokus Desa (Gelap)', layer: layer_EfekGelap},
@@ -297,7 +321,6 @@
         lay.addTo(map);
         setBounds();
         
-        // Menampilkan Label Nama Tempat (POI)
         var i = 0;
         layer_POIPointofInterest_4.eachLayer(function(layer) {
             layer.bindTooltip((layer.feature.properties['Nama'] !== null?String('<div style="color: #2c3e50; font-weight: bold; background: white; padding: 3px 8px; border-radius: 6px; border: 1px solid #ccc; font-size: 10px; font-family: \'Poppins\', sans-serif;">' + layer.feature.properties['Nama']) + '</div>':''), {permanent: true, offset: [-0, -16], className: 'css_POIPointofInterest_4', direction: 'top'});

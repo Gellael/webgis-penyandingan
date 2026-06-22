@@ -18,17 +18,20 @@
         }
 
         body {
-            /* Gambar latar belakang dari Unsplash (bisa diganti URL-nya nanti) */
+            /* Gambar latar belakang dengan overlay gelap agar teks mudah dibaca */
             background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), 
                         url('https://images.unsplash.com/photo-1596401057633-54a8fe8ef647?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80') no-repeat center center/cover;
+            /* Pastikan background menempel utuh walau discroll di HP */
+            background-attachment: fixed; 
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
             color: #ffffff;
+            padding: 20px; /* Memberi jarak aman agar pinggiran tidak menempel di tepi HP */
         }
 
-        /* Efek Frosted Glass */
+        /* Efek Frosted Glass Utama */
         .glass-container {
             background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(12px);
@@ -38,7 +41,7 @@
             padding: 50px 40px;
             text-align: center;
             max-width: 850px;
-            width: 90%;
+            width: 100%;
             box-shadow: 0 15px 35px rgba(0,0,0,0.2);
             animation: fadeIn 1s ease-out;
         }
@@ -53,6 +56,7 @@
             margin-bottom: 10px;
             font-weight: 700;
             letter-spacing: 1px;
+            line-height: 1.2;
         }
 
         p {
@@ -64,11 +68,11 @@
         .card-grid {
             display: flex;
             flex-wrap: wrap;
-            gap: 25px;
+            gap: 20px; /* Jarak antar kartu sedikit dirapatkan */
             justify-content: center;
         }
 
-        /* Desain Tombol/Kartu Menu */
+        /* Desain Kartu Menu */
         .card {
             background: rgba(255, 255, 255, 0.15);
             border: 1px solid rgba(255, 255, 255, 0.3);
@@ -77,27 +81,27 @@
             width: 220px;
             text-decoration: none;
             color: #fff;
-            transition: all 0.4s ease;
+            transition: all 0.3s ease; /* Transisi dipercepat sedikit agar responsif di HP */
             display: flex;
             flex-direction: column;
             align-items: center;
         }
 
-        .card:hover {
-            transform: translateY(-10px);
+        .card:hover, .card:active {
+            transform: translateY(-8px);
             background: rgba(255, 255, 255, 0.25);
             box-shadow: 0 15px 25px rgba(0,0,0,0.3);
             border-color: #fff;
         }
 
         .card i {
-            font-size: 3rem;
+            font-size: 2.8rem;
             margin-bottom: 15px;
             color: #4facfe;
             transition: all 0.3s ease;
         }
 
-        .card:hover i {
+        .card:hover i, .card:active i {
             color: #00f2fe;
             transform: scale(1.1);
         }
@@ -105,18 +109,91 @@
         .card h3 {
             font-size: 1.2rem;
             margin-bottom: 5px;
+            font-weight: 600;
         }
 
         .card span {
             font-size: 0.85rem;
             color: #dcdcdc;
+            line-height: 1.4;
         }
 
         .footer-text {
-            margin-top: 45px;
-            font-size: 0.9rem;
+            margin-top: 40px;
+            font-size: 0.85rem;
             color: #cccccc;
             letter-spacing: 0.5px;
+        }
+
+        /* ====================================================
+           MEDIA QUERIES (Agar Responsif di Layar Tablet & Mobile)
+           ==================================================== */
+        
+        /* Untuk Tablet / Layar Menengah */
+        @media (max-width: 768px) {
+            .glass-container {
+                padding: 40px 30px;
+            }
+            h1 {
+                font-size: 2.2rem;
+            }
+            .card {
+                width: calc(50% - 15px); /* Kartu dibagi 2 kolom rata tengah */
+            }
+        }
+
+        /* Untuk Smartphone / Layar Kecil */
+        @media (max-width: 480px) {
+            body {
+                padding: 15px;
+            }
+            .glass-container {
+                padding: 35px 20px;
+                border-radius: 15px;
+            }
+            h1 {
+                font-size: 1.8rem;
+                margin-bottom: 8px;
+            }
+            p {
+                font-size: 0.95rem;
+                margin-bottom: 30px;
+            }
+            .card-grid {
+                flex-direction: column; /* Mengubah susunan kartu menjadi baris ke bawah */
+                gap: 15px;
+            }
+            .card {
+                width: 100%; /* Kartu memenuhi seluruh lebar layar HP */
+                max-width: 300px; /* Diberi batas maksimal agar tidak terlalu melar */
+                margin: 0 auto; /* Posisi di tengah */
+                padding: 20px 15px;
+                flex-direction: row; /* Ikon dan teks bersebelahan agar menghemat ruang */
+                text-align: left;
+                align-items: center;
+            }
+            .card i {
+                font-size: 2rem;
+                margin-bottom: 0;
+                margin-right: 15px;
+                width: 40px;
+                text-align: center;
+            }
+            .card-content {
+                display: flex;
+                flex-direction: column;
+            }
+            .card h3 {
+                font-size: 1.1rem;
+                margin-bottom: 2px;
+            }
+            .card span {
+                font-size: 0.8rem;
+            }
+            .footer-text {
+                margin-top: 30px;
+                font-size: 0.75rem;
+            }
         }
     </style>
 </head>
@@ -129,20 +206,26 @@
         <div class="card-grid">
             <a href="peta.html" class="card">
                 <i class="fa-solid fa-map-location-dot"></i>
-                <h3>Peta Digital</h3>
-                <span>Jelajahi wilayah desa</span>
+                <div class="card-content">
+                    <h3>Peta Digital</h3>
+                    <span>Jelajahi wilayah desa</span>
+                </div>
             </a>
             
             <a href="https://desa-penyandingan.vercel.app/" class="card" target="_blank">
                 <i class="fa-solid fa-house-chimney"></i>
-                <h3>Profil Desa</h3>
-                <span>Informasi & potensi</span>
+                <div class="card-content">
+                    <h3>Profil Desa</h3>
+                    <span>Informasi & potensi</span>
+                </div>
             </a>
             
             <a href="https://pengolahan-sampah.vercel.app/" class="card" target="_blank">
                 <i class="fa-solid fa-recycle"></i>
-                <h3>Lapor Sampah</h3>
-                <span>Sistem pelaporan warga</span>
+                <div class="card-content">
+                    <h3>Lapor Sampah</h3>
+                    <span>Sistem pelaporan warga</span>
+                </div>
             </a>
         </div>
 
